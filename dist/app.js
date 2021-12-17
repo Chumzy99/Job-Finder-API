@@ -18,6 +18,7 @@ app.use(express_1.default.json());
 // extra packages
 const authController_1 = __importDefault(require("./controllers/authController"));
 // Security
+// rate limmiter
 app.set("trust proxy", 1);
 app.use((0, express_rate_limit_1.default)({
     windowMs: 15 * 60 * 1000,

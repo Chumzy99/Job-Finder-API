@@ -23,6 +23,7 @@ const UserSchema: mongoose.Schema<IUser> = new mongoose.Schema({
     required: [true, "Please provide email"],
     lowercase: true,
     trim: true,
+    //regex for validating correctness of an email
     match: [
       /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
       "Please provide a valid email",
@@ -42,6 +43,7 @@ const UserSchema: mongoose.Schema<IUser> = new mongoose.Schema({
   },
 });
 
+// hashing the password, using the pre save hook, instead of in the controllers.
 UserSchema.pre("save", async function (next) {
   const salt = await bcrypt.genSalt(12);
   this.password = await bcrypt.hash(this.password, salt);
@@ -51,6 +53,7 @@ UserSchema.pre("save", async function (next) {
 //   return this.fullname;
 // };
 
+// writing a method on the schema to create the jwt token
 UserSchema.methods.createJWT = function () {
   return jwt.sign(
     {
@@ -63,6 +66,7 @@ UserSchema.methods.createJWT = function () {
   );
 };
 
+// comparing incoming password with the password saved in the database.
 UserSchema.methods.comparePassword = async function (incomingPassword: string) {
   const isMatch = await bcrypt.compare(incomingPassword, this.password);
   return isMatch;

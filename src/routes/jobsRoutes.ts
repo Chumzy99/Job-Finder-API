@@ -8,6 +8,7 @@ router
   .post(jobsController.createJob)
   .get(authController.authProtect, jobsController.getAllJobs);
 
+// This gets all jobs, regardless of who is logged in, regardless of the role.
 router.route("/all").get(jobsController.getEveryJob);
 
 router

@@ -33,10 +33,12 @@ const getAllJobs = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, voi
     });
 }));
 const getEveryJob = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    // Using query params to filter query;
     const queryObj = Object.assign({}, req.query);
     const excludedFields = ["page", "sort", "limit", "fields"];
     excludedFields.forEach((el) => delete queryObj[el]);
     let query = Job_1.default.find(queryObj).sort("createdAt");
+    // finally awaiting query after filtering
     let jobs = yield query;
     // const jobs = await Job.find().where("languageCategory").equals("node");
     res.status(200).json({
@@ -48,6 +50,7 @@ const getEveryJob = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, vo
 const getJob = (0, catchAsync_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     let job;
     let { user, params: { id: jobId }, } = req;
+    // ensuring that an employer can only find his/her job.
     if ((user === null || user === void 0 ? void 0 : user.role) === "employer") {
         job = yield Job_1.default.findOne({
             _id: jobId,
@@ -67,6 +70,7 @@ const getJob = (0, catchAsync_1.default)((req, res, next) => __awaiter(void 0, v
 }));
 const createJob = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _c;
+    // adding the created by field manually, since it is not passed with the request body.
     req.body.createdBy = (_c = req.user) === null || _c === void 0 ? void 0 : _c.userId;
     const job = yield Job_1.default.create(req.body);
     res.status(201).json({
@@ -76,6 +80,7 @@ const createJob = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void
 }));
 const updateJob = (0, catchAsync_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     let { user, params: { id: jobId }, } = req;
+    // taking account of who created the job before updating.
     const job = yield Job_1.default.findByIdAndUpdate({ _id: jobId, createdBy: user === null || user === void 0 ? void 0 : user.userId }, req.body, {
         new: true,
         runValidators: true,
@@ -90,6 +95,7 @@ const updateJob = (0, catchAsync_1.default)((req, res, next) => __awaiter(void 0
 }));
 const deleteJob = (0, catchAsync_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     let { user, params: { id: jobId }, } = req;
+    // ensuring that employers can only delete their own jobs.
     const job = yield Job_1.default.findOneAndRemove({
         _id: jobId,
         createdBy: user === null || user === void 0 ? void 0 : user.userId,

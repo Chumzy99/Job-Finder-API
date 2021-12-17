@@ -9,7 +9,7 @@ const handleCastErrorDB = function (err) {
     return new appError_1.default(message, 400);
 };
 module.exports = (err, req, res, next) => {
-    //   console.log(err.stack);
+    console.log(err.stack);
     err.statusCode = err.statusCode || 500;
     err.status = err.status || "error";
     let error = Object.assign({}, err);

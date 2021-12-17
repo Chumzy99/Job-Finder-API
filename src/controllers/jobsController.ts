@@ -21,12 +21,14 @@ const getAllJobs = catchAsync(async (req: CustomRequest, res: Response) => {
 });
 
 const getEveryJob = catchAsync(async (req: CustomRequest, res: Response) => {
+  // Using query params to filter query;
   const queryObj = { ...req.query };
   const excludedFields = ["page", "sort", "limit", "fields"];
   excludedFields.forEach((el) => delete queryObj[el]);
 
   let query = Job.find(queryObj).sort("createdAt");
 
+  // finally awaiting query after filtering
   let jobs = await query;
 
   // const jobs = await Job.find().where("languageCategory").equals("node");
@@ -46,6 +48,7 @@ const getJob = catchAsync(
       params: { id: jobId },
     } = req;
 
+    // ensuring that an employer can only find his/her job.
     if (user?.role === "employer") {
       job = await Job.findOne({
         _id: jobId,
@@ -67,6 +70,7 @@ const getJob = catchAsync(
 );
 
 const createJob = catchAsync(async (req: CustomRequest, res: Response) => {
+  // adding the created by field manually, since it is not passed with the request body.
   req.body.createdBy = req.user?.userId;
   const job = await Job.create(req.body);
   res.status(201).json({
@@ -82,6 +86,7 @@ const updateJob = catchAsync(
       params: { id: jobId },
     } = req;
 
+    // taking account of who created the job before updating.
     const job = await Job.findByIdAndUpdate(
       { _id: jobId, createdBy: user?.userId },
       req.body,
@@ -108,6 +113,7 @@ const deleteJob = catchAsync(
       params: { id: jobId },
     } = req;
 
+    // ensuring that employers can only delete their own jobs.
     const job = await Job.findOneAndRemove({
       _id: jobId,
       createdBy: user?.userId,

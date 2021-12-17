@@ -16,6 +16,8 @@ app.use(express.json());
 import authController from "./controllers/authController";
 
 // Security
+
+// rate limmiter
 app.set("trust proxy", 1);
 app.use(
   rateLimiter({
